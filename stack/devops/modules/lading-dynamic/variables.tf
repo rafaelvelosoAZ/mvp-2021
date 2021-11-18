@@ -10,10 +10,7 @@ variable "address_space" {
 }
 
 variable "subnets" {
-  type = list(object({
-    name           = string
-    address_prefix = string
-  }))
+  type = any
 }
 
 variable "vnet-name" {

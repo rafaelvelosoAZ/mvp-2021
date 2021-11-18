@@ -1,40 +1,29 @@
-module "development" {
-  source = "../modules/landing-zone"
-
-  vnet-name           = "mvp-vnet"
-  resource_group_name = "mvpconf"
-  location            = "westeurope"
-  address_space       = ["10.0.0.0/16"]
-  address_prefix      = "10.0.1.0/24"
-  subnet-name         = "front-end"
+resource "azurerm_resource_group" "rg" {
+  name     = "mvpconfrc"
+  location = "eastus"
 }
 
-module "development-dynamic" {
-  source = "../modules/lading-dynamic"
-
-  vnet-name           = "mvp-vnet-dynamic"
-  resource_group_name = "mvpconf-dynamic"
-  location            = "westeurope"
-  address_space       = ["192.168.0.0/16"]
-
-  subnets = [
-    {
-      name           = "snet01"
-      address_prefix = "192.168.1.0/24"
-    },
-    {
-      name           = "snet02"
-      address_prefix = "192.168.2.0/24"
-    },
-    {
-      name           = "snet03"
-      address_prefix = "192.168.3.0/24"
-    },
-    {
-      name           = "snet04"
-      address_prefix = "192.168.4.0/24"
+module "vnet-west" {
+  source              = "../modules/vnet"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = "eastus"
+  vnet_name           = "vnet-west-europe"
+  address_space       = ["10.0.0.0/16", "192.168.0.0/24"]
+  subnets = {
+    subnet1 = {
+      address_prefix = "10.0.0.0/24"
     }
+    subnet2 = {
+      address_prefix = "10.0.1.0/24"
+    }
+    subnet3 = {
+      address_prefix = "192.168.0.0/27"
+    }
+    subnet4 = {
+      address_prefix = "10.0.2.0/24"
+    }
+  }
+  depends_on = [
+    azurerm_resource_group.rg
   ]
-
 }
-
