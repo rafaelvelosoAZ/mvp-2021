@@ -1,0 +1,25 @@
+header-from: main.tf
+
+formatter: "markdown table"
+
+sort:
+  enable: true
+  by: required
+
+content: |
+  {{ .Header }}
+
+  {{ .Inputs }}
+
+  {{ .Outputs }}
+
+  {{ .Resources }}
+
+  <sub>Feito com carinho para o MVP Conf</sub>
+
+settings:
+  color: true
+  default: true
+  descrition: true
+  sensitive: true
+  type: true
