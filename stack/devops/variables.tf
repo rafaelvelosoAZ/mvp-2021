@@ -1,3 +1,4 @@
 variable "dns_settings" {
-  type = any
+  type    = any
+  default = null
 }
