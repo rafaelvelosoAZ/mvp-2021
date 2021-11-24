@@ -10,6 +10,24 @@ This module presents an easy way to provision all you need for you virtual netwo
  - Route Table Attachment
  - Virtual Network Peering
 
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~> 2.77 |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azurerm_subnet.subnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
+| [azurerm_subnet_nat_gateway_association.nat](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_nat_gateway_association) | resource |
+| [azurerm_subnet_network_security_group_association.vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_network_security_group_association) | resource |
+| [azurerm_subnet_route_table_association.vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_route_table_association) | resource |
+| [azurerm_virtual_network.vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
+| [azurerm_virtual_network_peering.vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network_peering) | resource |
+| [azurerm_resource_group.vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |
+
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -40,17 +58,206 @@ This module presents an easy way to provision all you need for you virtual netwo
 | <a name="output_vnet_subnet_ids"></a> [vnet\_subnet\_ids](#output\_vnet\_subnet\_ids) | n/a |
 | <a name="output_vnet_subnet_names"></a> [vnet\_subnet\_names](#output\_vnet\_subnet\_names) | n/a |
 
-## Resources
+## Examples
+### Basic Virtual Network Example
 
-| Name | Type |
-|------|------|
-| [azurerm_subnet.subnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
-| [azurerm_subnet_nat_gateway_association.nat](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_nat_gateway_association) | resource |
-| [azurerm_subnet_network_security_group_association.vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_network_security_group_association) | resource |
-| [azurerm_subnet_route_table_association.vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_route_table_association) | resource |
-| [azurerm_virtual_network.vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
-| [azurerm_virtual_network_peering.vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network_peering) | resource |
-| [azurerm_resource_group.vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |
+``` hcl
+resource "azurerm_resource_group" "rg" {
+  name     = var.resource_group_name
+  location = var.location
+  tags     = var.tags
+}
 
-<sub>Feito com carinho para o MVP Conf</sub>
+module "vnet-west" {
+  source              = "../"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = "westeurope"
+  vnet_name           = "vnet-west-europe"
+  address_space       = ["10.0.0.0/16", "192.168.0.0/24"]
+  subnets = {
+    subnet1 = {
+      address_prefix = "10.0.0.0/24"
+    }
+    subnet2 = {
+      address_prefix = "10.0.1.0/24"
+    }
+    subnet3 = {
+      address_prefix = "192.168.0.0/27"
+    }
+  }
+}
+```
+
+### Two Virtual Networks + VNet Peering Example
+``` hcl
+resource "azurerm_resource_group" "rg" {
+  name     = var.resource_group_name
+  location = var.location
+  tags     = var.tags
+}
+
+module "vnet-west" {
+  source              = "../"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = "westus2"
+  vnet_name           = "vnet-westus2"
+  address_space       = ["10.0.0.0/16", "192.168.0.0/24"]
+  subnets = {
+    subnet1 = {
+      address_prefix = "10.0.0.0/24"
+    }
+    subnet2 = {
+      address_prefix = "10.0.1.0/24"
+    }
+    subnet3 = {
+      address_prefix = "192.168.0.0/27"
+    }
+  }
+  
+  vnet_peering_settings = {
+    vnet1-to-vnet2 = {
+      remote_vnet_id = module.vnet-east.vnet_id
+    }
+    vnet2 = {
+      remote_vnet_id = "/subscriptions/ff14dd7f-37f0-4ef30-b9d3-80ed9003cce5/resourceGroups/rg-minecraft/providers/Microsoft.Network/virtualNetworks/minecraft-vnet"
+    }
+  }
+
+  tags = var.tags
+  depends_on = [
+    azurerm_resource_group.rg
+  ]
+}
+
+module "vnet-east" {
+  source              = "../"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  vnet_name           = "vnet-eastus2"
+  address_space       = ["10.1.0.0/16", "192.169.0.0/24"]
+  subnets = {
+    subnet1 = {
+      address_prefix = "10.1.0.0/24"
+    }
+    subnet2 = {
+      address_prefix = "10.1.1.0/24"
+    }
+    subnet3 = {
+      address_prefix = "192.169.0.0/27"
+    }
+  }
+
+  vnet_peering_settings = {
+    "vnet2-to-vnet1" = {
+      remote_vnet_id = module.vnet-west.vnet_id
+    }
+  }
+
+  tags = var.tags
+  depends_on = [
+    azurerm_resource_group.rg
+  ]
+}
+```
+
+### Virtual Network with Service endpoints Example
+``` hcl
+resource "random_pet" "pet" {
+  length    = 2
+  separator = "-"
+}
+
+resource "azurerm_resource_group" "rg" {
+  name     = join("-", ["rg", random_pet.pet.id])
+  location = var.location
+  tags     = var.tags
+  depends_on = [
+    random_pet.pet
+  ]
+}
+
+module "vnet-east" {
+  source              = "../../"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  tags                = var.tags
+  vnet_name           = join("-", ["vnet", random_pet.pet.id])
+  address_space       = ["10.1.0.0/16", "192.169.0.0/24"]
+
+  subnets = {
+    subnet1 = {
+      address_prefix    = "10.1.0.0/24"
+      service_endpoints = ["Microsoft.KeyVault", "Microsoft.Web"]
+    }
+    subnet2 = {
+      address_prefix    = "10.1.1.0/24"
+      service_endpoints = ["Microsoft.Sql", "Microsoft.Storage"]
+    }
+    subnet3 = {
+      address_prefix = "192.169.0.0/27"
+    }
+  }
+
+  depends_on = [
+    azurerm_resource_group.rg
+  ]
+}
+```
+
+### Virtual Network with Subnet Delegation Example
+``` hcl
+resource "azurerm_resource_group" "rg" {
+  name     = var.resource_group_name
+  location = var.location
+  tags     = var.tags
+}
+
+module "vnet-west" {
+  source              = "../../"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = "westus2"
+  vnet_name           = "vnet-westus2"
+  address_space       = ["10.0.0.0/16", "192.168.0.0/24"]
+  subnets = {
+    subnet1 = {
+      address_prefix = "10.0.0.0/24"
+      delegation = {
+        name = "delegation1"
+        service_delegation = {
+          name = "Microsoft.ApiManagement/service"
+          actions = [
+            "Microsoft.Network/networkinterfaces/*",
+            "Microsoft.Network/virtualNetworks/subnets/action",
+            "Microsoft.Network/virtualNetworks/subnets/join/action"
+          ]
+        }
+      }
+    }
+    subnet2 = {
+      address_prefix = "10.0.1.0/24"
+    }
+    subnet3 = {
+      address_prefix = "192.168.0.0/27"
+    }
+  }
+
+  tags = var.tags
+  depends_on = [
+    azurerm_resource_group.rg
+  ]
+}
+```
+
+## Deseja contribuir?
+
+Para contruibuir com este repositório você deve instalar o [**Terraform-docs**](https://terraform-docs.io/user-guide/installation/).
+Etapas:
+* Clone este repositório;
+* Crie uma branch;
+* Realize todas as modificações que deseja;
+* Faça o commit e crie uma tag (v1.1.0, v1.2.3, etc);
+* Documente o código usando `make all`;
+* Faça o push da sua branch seguido de um Pull Request.
+
+<sub>Para dúvidas mande um contato: [carlos.oliveira@softwareone.com](mailto:carlos.oliveira@softwareone.com)</sub>
 
