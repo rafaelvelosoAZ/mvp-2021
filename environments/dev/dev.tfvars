@@ -1,3 +1,11 @@
+#************************************
+# RG Vars
+#************************************
+rg_name  = "rg-mvp-devops"
+rg_location = "westeurope"
+#************************************
+# DNS Vars
+#************************************
 dns_settings = {
   "mvpconf.com" = {
     dns_records = [
@@ -8,9 +16,9 @@ dns_settings = {
         record = ["177.52.183.104"]
       },
       {
-        name = "@"
-        type = "A"
-        ttl = 300
+        name   = "@"
+        type   = "A"
+        ttl    = 300
         record = ["182.123.2.31"]
       }
     ]
@@ -24,11 +32,35 @@ dns_settings = {
         record = ["177.52.183.104"]
       },
       {
-        name = "@"
-        type = "A"
-        ttl = 300
+        name   = "@"
+        type   = "A"
+        ttl    = 300
         record = ["182.123.2.31"]
       }
     ]
   }
 }
+#************************************
+# VNET Vars
+#************************************
+vnet_name          = "vnet-dev"
+vnet_address_space = ["10.2.0.0/16"]
+subnets_vnet = {
+  snet-dev = {
+    address_prefix = "10.2.0.0/19"
+  }
+  snet-psql-dev = {
+    address_prefix = "10.2.34.0/23"
+    delegation = {
+      name = "psql"
+      service_delegation = {
+        name = "Microsoft.DBforPostgreSQL/flexibleServers"
+        actions = [
+          "Microsoft.Network/virtualNetworks/subnets/join/action",
+        ]
+      }
+    }
+  }
+}
+
+
