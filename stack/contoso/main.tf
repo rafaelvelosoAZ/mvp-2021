@@ -1,10 +1,7 @@
-module "rg"{
-    source              = "../../modules/rg"
-    rg_name = "dev-app-gybr"
-    tags = {
-    "key" = "value"
-  } 
-    
+module "rg" {
+  source   = "../../modules/rg"
+  rg_name  = var.rg_name
+  location = var.rg_location
 }
 
 module "dns" {
@@ -24,17 +21,12 @@ module "vnet" {
 
   resource_group_name = module.rg.name
   location            = module.rg.location
+  vnet_name           = var.vnet-name
+  address_space       = var.vnet-address-space
+  subnets             = var.subnets-vnet
 
-  vnet_name     = "vnet-mvpconf"
-  address_space = ["10.0.0.0/16", "192.168.0.0/16"]
-  subnets = {
-    subnet1 = {
-      address_prefix = "10.0.0.0/24"
-    }
-    subnet2 = {
-      address_prefix = "192.168.0.0/24"
-    }
-  }
+  nsg_ids               = yamldecode(file(var.path-nsg-vnet-aks))
+  vnet_peering_settings = yamldecode(file(var.path-peering-settings-vnet-aks))
 
   depends_on = [
     module.rg
