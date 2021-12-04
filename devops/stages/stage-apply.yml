@@ -1,0 +1,38 @@
+stages:        
+- stage: stageApply
+  displayName: Apply Start
+  variables:
+    - group: bbi-bold-profile-vars
+  jobs:
+  - job: jobApply
+    displayName: Deployment Steps
+    steps:
+      - task: TerraformCLI@0
+        displayName: Terraform init
+        inputs:
+          command: 'init'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/stacks/bold_profiles'
+          commandOptions: '-reconfigure'
+          backendType: 'azurerm'
+          backendServiceArm: 'brbb-sp-terraform-azdevops'
+          backendAzureRmResourceGroupName: '$(TF-BACKEND-RESOURCE-GROUP)'
+          backendAzureRmStorageAccountName: '$(TF-BACKEND-STORAGE-ACCOUNT)'
+          backendAzureRmContainerName: '$(TF-BACKEND-CONTAINER)'
+          backendAzureRmKey: '$(TF-BACKEND-KEY)'
+          allowTelemetryCollection: true
+      - task: TerraformCLI@0
+        displayName: 'Carregando locals e Resource Group'
+        inputs:
+          command: 'apply'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/stacks/bold_profiles'
+          environmentServiceName: 'brbb-sp-terraform-azdevops'
+          commandOptions: '-var-file=../env/dev.tfvars -target local.role_assignments -target azurerm_resource_group.rg'
+          allowTelemetryCollection: true
+      - task: TerraformCLI@0
+        inputs:
+          command: 'apply'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/stacks/bold_profiles'
+          environmentServiceName: 'brbb-sp-terraform-azdevops'
+          commandOptions: '-var-file=../env/dev.tfvars'
+          allowTelemetryCollection: true
+        displayName: 'Terraform Apply'

@@ -1,24 +1,29 @@
-resource "azurerm_resource_group" "rg" {
-  name     = "mvpconfrc"
-  location = "eastus"
+module "rg"{
+    source              = "../../modules/rg"
+    rg_name = "dev-app-gybr"
+    tags = {
+    "key" = "value"
+  } 
+    
 }
-module "dns" {
-  source = "./modules/dns-zone"
 
-  resource_group_name = azurerm_resource_group.rg.name
+module "dns" {
+  source = "../../modules/dns-zone"
+
+  resource_group_name = module.rg.name
   for_each            = var.dns_settings
   zone_name           = each.key
   dns_records         = each.value.dns_records
   depends_on = [
-    azurerm_resource_group.rg
+    module.rg
   ]
 }
 
 module "vnet" {
-  source = "./modules/vnet"
+  source = "../../modules/vnet"
 
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
+  resource_group_name = module.rg.name
+  location            = module.rg.location
 
   vnet_name     = "vnet-mvpconf"
   address_space = ["10.0.0.0/16", "192.168.0.0/16"]
@@ -32,6 +37,6 @@ module "vnet" {
   }
 
   depends_on = [
-    azurerm_resource_group.rg
+    module.rg
   ]
 }

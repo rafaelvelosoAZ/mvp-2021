@@ -1,0 +1,30 @@
+stages:
+- stage: stageDestroy
+  displayName: Destruction Start
+  variables:
+    - group: bbi-bold-profile-vars
+  jobs:
+  - job: jobDestroy
+    displayName: Deployment Steps
+    steps:
+      - task: TerraformCLI@0
+        displayName: Terraform init
+        inputs:
+          command: 'init'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/stacks/bold_profiles'
+          commandOptions: '-reconfigure'
+          backendType: 'azurerm'
+          backendServiceArm: 'brbb-sp-terraform-azdevops'
+          backendAzureRmResourceGroupName: '$(TF-BACKEND-RESOURCE-GROUP)'
+          backendAzureRmStorageAccountName: '$(TF-BACKEND-STORAGE-ACCOUNT)'
+          backendAzureRmContainerName: '$(TF-BACKEND-CONTAINER)'
+          backendAzureRmKey: '$(TF-BACKEND-KEY)'
+          allowTelemetryCollection: true
+      - task: TerraformCLI@0
+        displayName: Terraform destroy
+        inputs:
+          command: 'destroy'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/stacks/bold_profiles'
+          environmentServiceName: 'brbb-sp-terraform-azdevops'
+          commandOptions: '-input=false -var-file=../env/dev.tfvars'
+          allowTelemetryCollection: true
