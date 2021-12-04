@@ -13,10 +13,10 @@ stages:
         displayName: Terraform init
         inputs:
           command: 'init'
-          workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/stacks/bold_profiles'
+          workingDirectory: '$(System.DefaultWorkingDirectory)'
           commandOptions: '-reconfigure'
           backendType: 'azurerm'
-          backendServiceArm: 'brbb-sp-terraform-azdevops'
+          backendServiceArm: ''
           backendAzureRmResourceGroupName: '$(TF-BACKEND-RESOURCE-GROUP)'
           backendAzureRmStorageAccountName: '$(TF-BACKEND-STORAGE-ACCOUNT)'
           backendAzureRmContainerName: '$(TF-BACKEND-CONTAINER)'
@@ -25,8 +25,8 @@ stages:
       - task: TerraformCLI@0
         inputs:
           command: 'apply'
-          workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/stacks/bold_profiles'
-          environmentServiceName: 'brbb-sp-terraform-azdevops'
-          commandOptions: '-var-file=../env/dev.tfvars'
+          workingDirectory: '$(System.DefaultWorkingDirectory)'
+          environmentServiceName: ''
+          commandOptions: '-var-file=../'
           allowTelemetryCollection: true
         displayName: 'Terraform Apply'

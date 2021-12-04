@@ -33,7 +33,7 @@ stages:
         steps:
           - task: AzureCLI@2
             inputs:
-              azureSubscription: 'brbb-sp-terraform-azdevops'
-              scriptType: 'bash'
-              scriptLocation: 'inlineScript'
-              inlineScript: 'az network vnet peering delete --name valhalla-to-boldprofile --vnet-name VNET_VALHALLA_CLOUD -g RGBBIVPNS2S'
+              azureSubscription: ''
+              scriptType: ''
+              scriptLocation: ''
+              inlineScript: ''
