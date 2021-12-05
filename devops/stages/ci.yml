@@ -8,7 +8,7 @@ stages:
     displayName: Teste de Inicialização Terraform
     steps:
     - task: TerraformCLI@0
-
+      displayName: Terraform Init
       inputs:
         command: 'init'
         workingDirectory: '$(System.DefaultWorkingDirectory)/stack/contoso'
@@ -24,12 +24,26 @@ stages:
     displayName: Validação do Código
     steps:
       - task: TerraformCLI@0
+        displayName: Terraform Init
+        inputs:
+          command: 'init'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/stack/contoso'
+          backendType: 'azurerm'
+          backendServiceArm: 'ccs-dev-001'
+          backendAzureRmResourceGroupName: '$(TF-BACKEND-RESOURCE-GROUP)'
+          backendAzureRmStorageAccountName: '$(TF-BACKEND-STORAGE-ACCOUNT)'
+          backendAzureRmContainerName: '$(TF-BACKEND-CONTAINER)'
+          backendAzureRmKey: '$(TF-BACKEND-KEY)'
+          allowTelemetryCollection: true
+      - task: TerraformCLI@0
+        displayName: Terraform Validate
         inputs:
           command: 'validate'
           workingDirectory: '$(System.DefaultWorkingDirectory)/stack/contoso'
           allowTelemetryCollection: true
 
       - task: TerraformCLI@0
+        displayName: Terraform FMT
         inputs:
           command: 'fmt'
           workingDirectory: '$(System.DefaultWorkingDirectory)/stack/contoso'
@@ -40,7 +54,7 @@ stages:
     dependsOn: Validateterraform
     steps:
     - task: TerraformCLI@0
-
+      displayName: Terraform init
       inputs:
         command: 'init'
         workingDirectory: '$(System.DefaultWorkingDirectory)/stack/contoso'
@@ -52,6 +66,7 @@ stages:
         backendAzureRmKey: '$(TF-BACKEND-KEY)'
         allowTelemetryCollection: true
     - task: TerraformCLI@0
+      displayName: Terraform Plan
       inputs:
         command: 'plan'
         workingDirectory: '$(System.DefaultWorkingDirectory)/stack/contoso'
