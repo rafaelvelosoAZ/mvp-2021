@@ -23,10 +23,3 @@ stages:
     variables:
       - group: kv-tf
   - template: stages/stage-destroy.yml
-  - stage: Stage2
-    displayName: Peering setup
-    jobs:
-      - job: RemoveVnetPeering
-        displayName: Remove Vnet Peering
-        pool:
-          vmImage: ubuntu-latest
