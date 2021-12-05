@@ -2,7 +2,7 @@ stages:
 - stage: stageApply
   displayName: Apply Start
   variables:
-    - group: bbi-bold-profile-vars
+    - group: kv-tf
   jobs:
   - job: jobApply
     displayName: Deployment Steps
@@ -11,10 +11,10 @@ stages:
         displayName: Terraform init
         inputs:
           command: 'init'
-          workingDirectory: '$(System.DefaultWorkingDirectory)'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/stack/contoso'
           commandOptions: '-reconfigure'
           backendType: 'azurerm'
-          backendServiceArm: ''
+          backendServiceArm: 'ccs-dev-001'
           backendAzureRmResourceGroupName: '$(TF-BACKEND-RESOURCE-GROUP)'
           backendAzureRmStorageAccountName: '$(TF-BACKEND-STORAGE-ACCOUNT)'
           backendAzureRmContainerName: '$(TF-BACKEND-CONTAINER)'
@@ -24,15 +24,15 @@ stages:
         displayName: 'Carregando locals e Resource Group'
         inputs:
           command: 'apply'
-          workingDirectory: '$(System.DefaultWorkingDirectory)'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/stack/contoso'
           environmentServiceName: ''
-          commandOptions: '-var-file=../env/dev.tfvars'
+          commandOptions: '-var-file=../../environments/dev/dev.tfvars'
           allowTelemetryCollection: true
       - task: TerraformCLI@0
         inputs:
           command: 'apply'
-          workingDirectory: '$(System.DefaultWorkingDirectory)'
-          environmentServiceName: ''
-          commandOptions: '-var-file=../'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/stack/contoso'
+          environmentServiceName: 'ccs-dev-001'
+          commandOptions: '-var-file=../../environments/dev/dev.tfvars'
           allowTelemetryCollection: true
         displayName: 'Terraform Apply'

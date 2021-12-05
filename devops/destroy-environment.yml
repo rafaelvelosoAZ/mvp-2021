@@ -21,7 +21,7 @@ stages:
       - job: job1
         displayName: Gathering Destroy Template
     variables:
-      - group: bbi-bold-profile-vars
+      - group: kv-tf
   - template: stages/stage-destroy.yml
   - stage: Stage2
     displayName: Peering setup
@@ -30,10 +30,3 @@ stages:
         displayName: Remove Vnet Peering
         pool:
           vmImage: ubuntu-latest
-        steps:
-          - task: AzureCLI@2
-            inputs:
-              azureSubscription: ''
-              scriptType: ''
-              scriptLocation: ''
-              inlineScript: ''

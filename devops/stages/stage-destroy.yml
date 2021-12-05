@@ -2,7 +2,7 @@ stages:
 - stage: stageDestroy
   displayName: Destruction Start
   variables:
-    - group: bbi-bold-profile-vars
+    - group: kv-tf
   jobs:
   - job: jobDestroy
     displayName: Deployment Steps
@@ -11,10 +11,10 @@ stages:
         displayName: Terraform init
         inputs:
           command: 'init'
-          workingDirectory: '$(System.DefaultWorkingDirectory)/'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/stack/contoso'
           commandOptions: '-reconfigure'
           backendType: 'azurerm'
-          backendServiceArm: ''
+          backendServiceArm: 'ccs-dev-001'
           backendAzureRmResourceGroupName: '$(TF-BACKEND-RESOURCE-GROUP)'
           backendAzureRmStorageAccountName: '$(TF-BACKEND-STORAGE-ACCOUNT)'
           backendAzureRmContainerName: '$(TF-BACKEND-CONTAINER)'
@@ -24,7 +24,7 @@ stages:
         displayName: Terraform destroy
         inputs:
           command: 'destroy'
-          workingDirectory: '$(System.DefaultWorkingDirectory)'
-          environmentServiceName: ''
-          commandOptions: '-input=false -var-file=../env/dev.tfvars'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/stack/contoso'
+          environmentServiceName: 'ccs-dev-001'
+          commandOptions: '-var-file=../../environments/dev/dev.tfvars'
           allowTelemetryCollection: true
