@@ -16,7 +16,7 @@ stages:
           workingDirectory: '$(System.DefaultWorkingDirectory)'
           commandOptions: '-reconfigure'
           backendType: 'azurerm'
-          backendServiceArm: ''
+          backendServiceArm: 'ccs-dev-001'
           backendAzureRmResourceGroupName: '$(TF-BACKEND-RESOURCE-GROUP)'
           backendAzureRmStorageAccountName: '$(TF-BACKEND-STORAGE-ACCOUNT)'
           backendAzureRmContainerName: '$(TF-BACKEND-CONTAINER)'
