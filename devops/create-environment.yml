@@ -21,5 +21,5 @@ stages:
       - job: job1
         displayName: Gathering Create Template
     variables:
-      - group: bbi-bold-profile-vars
+      - group: kv-tf
   - template: stages/stage-apply.yml
