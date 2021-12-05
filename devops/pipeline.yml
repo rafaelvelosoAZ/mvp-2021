@@ -1,7 +1,6 @@
 trigger:
   branches:
     exclude:
-    - BI/*
     - TK/*
     - BG/*
     - FT/*
@@ -25,8 +24,8 @@ stages:
     jobs: 
     - job: CIvalidation
     variables:
-    - group: bbi-bold-profile-vars
-  - template: stages/stages-ci.yml
+    - group: kv-tf
+  - template: stages/ci.yml
 
 
   - stage: CD
@@ -35,5 +34,5 @@ stages:
     jobs: 
     - job: "CD"
     variables:
-    - group: bbi-bold-profile-vars
-  - template: stages/stages-cd.yml
+    - group: kv-tf
+  - template: stages/cd.yml
