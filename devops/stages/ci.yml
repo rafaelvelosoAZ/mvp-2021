@@ -50,7 +50,7 @@ stages:
           commandOptions: '-check -diff'
           allowTelemetryCollection: true
     
-  - job: Terraformplan
+  - job: TerraformPlan
     dependsOn: Validateterraform
     steps:
     - task: TerraformCLI@0
