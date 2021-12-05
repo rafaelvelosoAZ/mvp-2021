@@ -13,7 +13,7 @@ stages:
         displayName: Terraform init
         inputs:
           command: 'init'
-          workingDirectory: '$(System.DefaultWorkingDirectory)'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/stack/contoso'
           commandOptions: '-reconfigure'
           backendType: 'azurerm'
           backendServiceArm: 'ccs-dev-001'
