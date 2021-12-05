@@ -2,7 +2,7 @@
 stages:        
 - stage: CDStage
   variables:
-    - group: bbi-bold-profile-vars
+    - group: kv-tf
   displayName: Continuous Deployment
   jobs:
       
@@ -25,8 +25,7 @@ stages:
       - task: TerraformCLI@0
         inputs:
           command: 'apply'
-          workingDirectory: '$(System.DefaultWorkingDirectory)'
-          environmentServiceName: ''
-          commandOptions: '-var-file=../'
+          environmentServiceName: 'ccs-dev-001'
+          commandOptions: '-var-file=../../environments/dev/dev.tfvars'
           allowTelemetryCollection: true
         displayName: 'Terraform Apply'
